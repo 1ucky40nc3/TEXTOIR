@@ -9,6 +9,9 @@ import sys
 import os
 import datetime
 
+import wandb
+
+
 def parse_arguments():
 
     parser = argparse.ArgumentParser()
@@ -72,7 +75,21 @@ def set_logger(args):
 
     time = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
     file_name = f"{args.method}_{args.dataset}_{args.backbone}_{args.known_cls_ratio}_{args.labeled_ratio}_{time}.log"
-    
+
+
+    wandb.init(
+        project="TEXTOIR-fork",
+        tags=[
+            "open_intent_discovery",
+            "semi_supervised",
+            args.method,
+            args.dataset,
+            args.backbone
+        ],
+        config=args
+    )
+
+
     logger = logging.getLogger(args.logger_name)
     logger.setLevel(logging.DEBUG)
 
