@@ -81,7 +81,6 @@ def set_logger(args):
         project="TEXTOIR-fork",
         tags=[
             "open_intent_discovery",
-            "semi_supervised",
             args.method,
             args.dataset,
             args.backbone
