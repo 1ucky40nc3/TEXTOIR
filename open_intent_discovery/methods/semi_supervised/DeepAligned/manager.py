@@ -16,6 +16,9 @@ from torch.utils.data import (DataLoader, SequentialSampler, TensorDataset)
 from utils.metrics import clustering_score
 from .pretrain import PretrainDeepAlignedManager
 
+import wandb
+
+
 class DeepAlignedManager:
     
     def __init__(self, args, data, model, logger_name = 'Discovery'):
@@ -62,7 +65,7 @@ class DeepAlignedManager:
 
             self.model = restore_model(self.model, args.model_output_dir)
 
-    def train(self, args, data): 
+    def train(self, args, data, prefix="train_"): 
 
         best_model = None
         wait = 0
@@ -81,7 +84,13 @@ class DeepAlignedManager:
                     'cluster_silhouette_score': eval_score,
                     'best_cluster_silhouette_score': best_eval_score,   
                 }
-
+                data = {
+                    **{
+                        f"{prefix}{k}": v 
+                        for k, v in eval_results},
+                    "epoch": epoch
+                }
+                wandb.log(data)
                 self.logger.info("***** Epoch: %s: Eval results *****", str(epoch))
                 for key in sorted(eval_results.keys()):
                     self.logger.info("  %s = %s", key, str(eval_results[key]))

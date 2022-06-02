@@ -11,6 +11,8 @@ from tqdm import trange, tqdm
 from losses import loss_map
 from utils.functions import save_model
 
+import wandb
+
 class PretrainDeepAlignedManager:
     
     def __init__(self, args, data, model, logger_name = 'Discovery'):
@@ -30,7 +32,7 @@ class PretrainDeepAlignedManager:
 
         self.loss_fct = loss_map[args.loss_fct]
 
-    def train(self, args, data):
+    def train(self, args, data, prefix="pretrain_"):
 
         wait = 0
         best_model = None
@@ -67,6 +69,13 @@ class PretrainDeepAlignedManager:
                 'eval_score': eval_score,
                 'best_score':best_eval_score,
             }
+            data = {
+                **{
+                    f"{prefix}{k}": v 
+                    for k, v in eval_results},
+                "epoch": epoch
+            }
+            wandb.log(data)
             self.logger.info("***** Epoch: %s: Eval results *****", str(epoch + 1))
             for key in sorted(eval_results.keys()):
                 self.logger.info("  %s = %s", key, str(eval_results[key]))
